@@ -1,3 +1,13 @@
+/*
+* File : main.cpp
+* Project: File Management System
+* Programmers: Juan Jose Bejarano and Brayan Rojas
+* First version: 27/09/2024
+* Description:
+* This program serves as the main entry point for a file management system,
+* allowing users to interact with different types of file access methods including
+* delimited files (CSV), random access files, and a placeholder for sequential access files.
+*/
 #include "RandomAccessFile.cpp"
 #include "DelimitedFiles(CSV).cpp"
 #include <stdio.h>

@@ -1,3 +1,14 @@
+/*
+*File : RandomAccessFile.cpp
+*Project: Assignment_1_Relational_Databases
+*Programmer: Juan Jose Bejarano
+*First version: 27/09/2024
+*Description:
+*This program manages an inventory system that allows users to add, view, update,
+*delete, and load products stored in a binary file using random access. The data is
+*stored in a structure that contains product details including ID, name, category,
+*quantity, and price.
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,6 +37,13 @@ void loadProducts();
 
 void menuRandomAccess();
 
+/*
+* FUNCTION : menuRandomAccess
+* DESCRIPTION :
+* This function displays the inventory management menu and handles user input
+* for different operations like adding, viewing, updating, and deleting products.
+* It runs in a loop until the user decides to exit.
+*/
 
 void menuRandomAccess()
 {
@@ -93,7 +111,12 @@ void menuRandomAccess()
             loadProducts();
             break;
         case 6:
-            exit(0);
+            char exitConfirmation;
+            printf("Are you sure you want to exit? (y/n): ");
+            scanf(" %c", &exitConfirmation);
+            if (exitConfirmation == 'y' || exitConfirmation == 'Y') {
+                exit(0);
+            }
             break;
 
         default:
@@ -103,8 +126,18 @@ void menuRandomAccess()
     }
 }
 
+/*
+* FUNCTION : addProduct
+* DESCRIPTION :
+* This function adds a new product to the inventory by writing to the binary file.
+* It checks for duplicate product IDs and handles file operations.
+* PARAMETERS :
+* int productId : The ID of the product to be added.
+* ProductRandomAccess product : The product structure containing product details.
+*/
+
 void addProduct(int productId, ProductRandomAccess product) {
-    FILE* file = fopen(FILENAME, "ab");
+    FILE* file = fopen(FILENAME, "rb+");
     // change postion for product Id check if the product Id is 0 and check if there is another one with the same product id.
    // (if there is nothing with that product then create the product, else return error)
     if (productId == 0) {
@@ -138,6 +171,17 @@ void addProduct(int productId, ProductRandomAccess product) {
     printf("Product added successfully.\n");
 }
 
+/*
+* FUNCTION : searchProductByPosition
+* DESCRIPTION :
+* This function searches for a product in the binary file by its ID.
+* PARAMETERS :
+* int productId : The ID of the product to search for.
+* RETURNS :
+* ProductRandomAccess : The product structure containing the found product details,
+* or a product with ID -1 if not found.
+*/
+
 ProductRandomAccess searchProductByPosition(int productId)
 {
     FILE* file = fopen(FILENAME, "rb");
@@ -163,8 +207,14 @@ ProductRandomAccess searchProductByPosition(int productId)
         exit(EXIT_FAILURE);
     }
     ProductRandomAccess notFound = { -1,"","", 0, 0.0 };
-    return product;
+    return notFound;
 }
+
+/*
+* FUNCTION : loadProducts
+* DESCRIPTION :
+* This function loads all products from the binary file and displays them.
+*/
 
 void loadProducts() {
     FILE* file = fopen(FILENAME, "rb");
@@ -189,6 +239,15 @@ void loadProducts() {
 
 }
 
+/*
+* FUNCTION : updateProduct
+* DESCRIPTION :
+* This function updates an existing product in the binary file.
+* PARAMETERS :
+* int position : The product ID to update.
+* ProductRandomAccess product : The updated product structure.
+*/
+
 void updateProduct(int position, ProductRandomAccess product) {
     FILE* file = fopen(FILENAME, "rb+");
     if (file == NULL) {
@@ -209,6 +268,14 @@ void updateProduct(int position, ProductRandomAccess product) {
         exit(EXIT_FAILURE);
     }
 }
+
+/*
+* FUNCTION : deleteProduct
+* DESCRIPTION :
+* This function deletes a product from the binary file by marking it as deleted.
+* PARAMETERS :
+* int productId : The ID of the product to be deleted.
+*/
 
 void deleteProduct(int productId) {
     FILE* file = fopen(FILENAME, "rb+");
@@ -234,6 +301,16 @@ void deleteProduct(int productId) {
     }
     printf("Product at productId %d has been deleted.\n", productId);
 }
+
+/*
+* FUNCTION : calculateHash
+* DESCRIPTION :
+* This function calculates the hash position in the file for a given product ID.
+* PARAMETERS :
+* int productId : The ID of the product.
+* RETURNS :
+* int : The calculated position in the file for the product.
+*/
 
 int calculateHash(int productId) {
     return productId * sizeof(ProductRandomAccess);
