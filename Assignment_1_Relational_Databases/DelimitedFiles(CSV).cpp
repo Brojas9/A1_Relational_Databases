@@ -24,12 +24,12 @@ void deleteProduct(int productId);
 void saveProducts(Product products[], int count);
 int loadProducts(Product products[]);
 
-int main() {
+int menuDelimitedFiles() {
     int choice, id;
     Product product, updatedProduct;
     Product products[MAX_RECORDS];
     int count;
-    
+
 
     while (1) {
         printf("\nInventory Management System\n");
@@ -121,7 +121,7 @@ void readProducts() {
     printf("\n   ProductId          Name                 Category           Quantity       Price\n");
     for (int i = 0; i < count; i++) {
         printf("|------------|----------------------|----------------------|------------|------------|\n");
-        printf("|%-10d  |  %-20s| %-20s |  %-10d|  $%-9.2f|\n", products[i].productId, products[i].name, products[i].category, 
+        printf("|%-10d  |  %-20s| %-20s |  %-10d|  $%-9.2f|\n", products[i].productId, products[i].name, products[i].category,
             products[i].quantity, products[i].price);
     }
     printf("|------------|----------------------|----------------------|------------|------------|\n");

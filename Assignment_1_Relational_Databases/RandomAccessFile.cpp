@@ -13,24 +13,24 @@ typedef struct {
     char category[50];
     int quantity;
     float price;
-} Product;
+} ProductRandomAccess;
 
 
 //Function prototypes
-void addProduct(const char* filename, int productId, Product product);
-Product searchProductByPosition(const char* filename, int productId);
-void updateProduct(const char* filename, int productId, Product product);
-void deleteProduct(const char* filename, int productId);
+void addProduct(int productId, ProductRandomAccess product);
+ProductRandomAccess searchProductByPosition(int productId);
+void updateProduct(int productId, ProductRandomAccess product);
+void deleteProduct(int productId);
 int calculateHash(int productId);
-void loadProducts(const char* filename);
+void loadProducts();
 
-void menuRandomAccess(const char* filename);
+void menuRandomAccess();
 
 
-void menuRandomAccess(const char* filename)
+void menuRandomAccess()
 {
     int choice, productId;
-    Product product;
+    ProductRandomAccess product;
 
     while (1) {
         printf("\nInventory Management System\n");
@@ -59,12 +59,12 @@ void menuRandomAccess(const char* filename)
             scanf("%d", &product.quantity);
             printf("Enter Price: ");
             scanf("%f", &product.price);
-            addProduct(filename, product.productId, product);
+            addProduct(product.productId, product);
             break;
         case 2:
             printf("Enter Product ID to search: ");
             scanf("%d", &productId);
-            product = searchProductByPosition(filename, productId);
+            product = searchProductByPosition(productId);
             printf("\nProduct ID: %d\nName: %s\nCategory: %s\nQuantity: %d\nPrice: %.2f\n",
                 product.productId, product.name, product.category, product.quantity, product.price);
             break;
@@ -82,15 +82,15 @@ void menuRandomAccess(const char* filename)
             scanf("%d", &product.quantity);
             printf("Enter new Price: ");
             scanf("%f", &product.price);
-            updateProduct(filename, productId, product);
+            updateProduct(productId, product);
             break;
         case 4:
             printf("Enter Product ID to delete: ");
             scanf("%d", &productId);
-            deleteProduct(filename, productId);
+            deleteProduct(productId);
             break;
         case 5:
-            loadProducts(filename);
+            loadProducts();
             break;
         case 6:
             exit(0);
@@ -103,8 +103,8 @@ void menuRandomAccess(const char* filename)
     }
 }
 
-void addProduct(const char* filename, int productId, Product product) {
-    FILE* file = fopen(filename, "ab");
+void addProduct(int productId, ProductRandomAccess product) {
+    FILE* file = fopen(FILENAME, "ab");
     // change postion for product Id check if the product Id is 0 and check if there is another one with the same product id.
    // (if there is nothing with that product then create the product, else return error)
     if (productId == 0) {
@@ -116,7 +116,7 @@ void addProduct(const char* filename, int productId, Product product) {
         printf("Cannot open file");
         exit(EXIT_FAILURE);
     }
-    Product existingProduct = searchProductByPosition(filename, productId);
+    ProductRandomAccess existingProduct = searchProductByPosition(productId);
     if (existingProduct.productId != -1) {
         printf("Product ID %d already exists.\n", productId);
         fclose(file);
@@ -127,7 +127,7 @@ void addProduct(const char* filename, int productId, Product product) {
         printf("Error seeking to the position %d. \n", whereToWriteTheRecord);
         exit(EXIT_FAILURE);
     }
-    if (fwrite(&product, sizeof(Product), 1, file) != 1) {
+    if (fwrite(&product, sizeof(ProductRandomAccess), 1, file) != 1) {
         printf("Error writing to the file\n");
         exit(EXIT_FAILURE);
     }
@@ -138,9 +138,9 @@ void addProduct(const char* filename, int productId, Product product) {
     printf("Product added successfully.\n");
 }
 
-Product searchProductByPosition(const char* filename, int productId)
+ProductRandomAccess searchProductByPosition(int productId)
 {
-    FILE* file = fopen(filename, "rb");
+    FILE* file = fopen(FILENAME, "rb");
     if (file == NULL) {
         printf("Cannot open file");
         exit(EXIT_FAILURE);
@@ -150,8 +150,8 @@ Product searchProductByPosition(const char* filename, int productId)
         printf("Error seeking to the position %d. \n", productId);
         exit(EXIT_FAILURE);
     }
-    Product product;
-    if (fread(&product, sizeof(Product), 1, file) == 1 && product.productId == productId) {
+    ProductRandomAccess product;
+    if (fread(&product, sizeof(ProductRandomAccess), 1, file) == 1 && product.productId == productId) {
         if (fclose(file) != 0) {
             printf("Error closing the file\n");
             exit(EXIT_FAILURE);
@@ -162,20 +162,20 @@ Product searchProductByPosition(const char* filename, int productId)
         printf("Error closing the file\n");
         exit(EXIT_FAILURE);
     }
-    Product notFound = { -1,"","", 0, 0.0 };
+    ProductRandomAccess notFound = { -1,"","", 0, 0.0 };
     return product;
 }
 
-void loadProducts(const char* filename) {
-    FILE* file = fopen(filename, "rb");
+void loadProducts() {
+    FILE* file = fopen(FILENAME, "rb");
     if (file == NULL) {
         printf("Cannot open file \n");
         return;
     }
 
-    Product product;
+    ProductRandomAccess product;
     printf("\nLoaded Products: \n");
-    while (fread(&product, sizeof(Product), 1, file) == 1) { 
+    while (fread(&product, sizeof(ProductRandomAccess), 1, file) == 1) {
         if (product.productId != -1) {  // Skip deleted products 
             printf("ID: %d, Name: %s, Category: %s, Quantity: %d, Price: %.2f\n",
                 product.productId, product.name, product.category, product.quantity, product.price); 
@@ -189,8 +189,8 @@ void loadProducts(const char* filename) {
 
 }
 
-void updateProduct(const char* filename, int position, Product product) {
-    FILE* file = fopen(filename, "rb+");
+void updateProduct(int position, ProductRandomAccess product) {
+    FILE* file = fopen(FILENAME, "rb+");
     if (file == NULL) {
         printf("Cannot open file");
         exit(EXIT_FAILURE);
@@ -200,7 +200,7 @@ void updateProduct(const char* filename, int position, Product product) {
         printf("Error seeking to the position %d. \n", whereToReadTheRecord);
         exit(EXIT_FAILURE);
     }
-   if (fwrite(&product, sizeof(Product), 1, file) != 1) {
+   if (fwrite(&product, sizeof(ProductRandomAccess), 1, file) != 1) {
        printf("Error writing to the file\n");
        exit(EXIT_FAILURE);
     }
@@ -210,8 +210,8 @@ void updateProduct(const char* filename, int position, Product product) {
     }
 }
 
-void deleteProduct(const char* filename, int productId) {
-    FILE* file = fopen(filename, "rb+");
+void deleteProduct(int productId) {
+    FILE* file = fopen(FILENAME, "rb+");
     if (file == NULL) {
         printf("Cannot open file");
         exit(EXIT_FAILURE);
@@ -222,8 +222,8 @@ void deleteProduct(const char* filename, int productId) {
        exit(EXIT_FAILURE);
    }
 
-    Product deletedProduct = { -1, "", "", 0, 0.0 };  // Mark as deleted
-    if (fwrite(&deletedProduct, sizeof(Product), 1, file) != 1) {
+   ProductRandomAccess deletedProduct = { -1, "", "", 0, 0.0 };  // Mark as deleted
+    if (fwrite(&deletedProduct, sizeof(ProductRandomAccess), 1, file) != 1) {
         printf("Error writing to the file\n");
         exit(EXIT_FAILURE);
     }
@@ -236,9 +236,5 @@ void deleteProduct(const char* filename, int productId) {
 }
 
 int calculateHash(int productId) {
-    return productId * sizeof(Product);
+    return productId * sizeof(ProductRandomAccess);
 }
-
-
-
-
